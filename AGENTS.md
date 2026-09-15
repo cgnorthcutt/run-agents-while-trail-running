@@ -2,6 +2,22 @@
 
 Read this file and both skills before acting. Run orchestration on a **Mac/Linux coordinator**, not on the phone or Windows worker. Inventory first; get account-owner approval before system changes. Never change the Windows SSH default shell, introduce portproxy, disable host-key checks, or put a personal PC to sleep as a test.
 
+## Architecture
+
+```mermaid
+flowchart TD
+  phone[Phone]
+  subgraph home[Home network]
+    coordinator["Always-on computer<br/>Agent, skills, tmux"]
+    worker["GPU worker<br/>Windows + WSL or Linux"]
+    coordinator <-->|"Private SSH: jobs and results"| worker
+    coordinator -.->|Wake-on-LAN| worker
+  end
+  phone <-->|"ChatGPT Remote relay<br/>5G or Wi-Fi"| coordinator
+  api[Cloud model API]
+  api <-->|Agent inference| coordinator
+```
+
 ## 0. Coordinator and phone setup
 
 Use **Mac as the default coordinator**: helpers support Mac/Linux, while ChatGPT Remote hosts support Mac/Windows. Linux coordinators need their own supported authenticated remote channel; this runbook supplies none. Windows coordination is not implemented by the helpers. Worker options are in section 2.

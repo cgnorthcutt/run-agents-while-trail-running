@@ -8,21 +8,9 @@ You need three things:
 2. An inexpensive, always-on computer, such as a used M1 Mac mini, to coordinate the work.
 3. A computer with at least one capable GPU, such as a gaming PC or deep-learning rig. GPU memory, RAM, CPU cores, and storage should fit the jobs you want to run.
 
-```mermaid
-flowchart TD
-  phone[Phone]
-  subgraph home[Home network]
-    coordinator["Always-on computer<br/>Agent, skills, tmux"]
-    worker["GPU worker<br/>Windows + WSL or Linux"]
-    coordinator <-->|"Private SSH: jobs and results"| worker
-    coordinator -.->|Wake-on-LAN| worker
-  end
-  phone <-->|"ChatGPT Remote relay<br/>5G or Wi-Fi"| coordinator
-  api[Cloud model API]
-  api <-->|Agent inference| coordinator
-```
+![Architecture: phone connects through an authenticated ChatGPT Remote relay to an always-on M1 Mac mini; the mini uses a cloud model API, sends GPU jobs over private LAN SSH, and wakes the Windows/WSL or Linux worker over Wake-on-LAN.](skills/gpu-compute/references/architecture.webp)
 
-The coordinator stays awake; the GPU worker can sleep between jobs. Phone access uses an authenticated relay; SSH and wake traffic stay on the home LAN.
+The coordinator stays awake; the GPU worker can sleep between jobs. Phone access uses an authenticated relay; SSH and wake traffic stay on the home LAN. See the [editable schematic](AGENTS.md#architecture) in the setup guide.
 
 ## Quick start
 
