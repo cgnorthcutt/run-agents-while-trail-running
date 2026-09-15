@@ -8,6 +8,8 @@ You need three things:
 2. An inexpensive, always-on computer, such as a used M1 Mac mini, to coordinate the work.
 3. A computer with at least one capable GPU, such as a gaming PC or deep-learning rig. GPU memory, RAM, CPU cores, and storage should fit the jobs you want to run.
 
+**FOR ENGINEERS:**
+
 ```mermaid
 flowchart TD
   phone[Phone]
@@ -22,9 +24,7 @@ flowchart TD
   api <-->|Agent inference| coordinator
 ```
 
-The above architecture diagram is for engineers and AI agents.
-
-If you are in sales, and especially marketing, please refer to this diagram.
+**FOR SALES AND MARKETING:**
 
 ![Architecture: phone connects through an authenticated ChatGPT Remote relay to an always-on M1 Mac mini; the mini uses a cloud model API, sends GPU jobs over private LAN SSH, and wakes the Windows/WSL or Linux worker over Wake-on-LAN.](skills/gpu-compute/references/architecture.webp)
 
