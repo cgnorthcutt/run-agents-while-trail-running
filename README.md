@@ -22,7 +22,9 @@ flowchart TD
   api <-->|Agent inference| coordinator
 ```
 
-This architecture diagram is for engineers. If you are in sales, and especially marketing, please refer to this diagram.
+The above architecture diagram is for engineers and AI agents.
+
+If you are in sales, and especially marketing, please refer to this diagram.
 
 ![Architecture: phone connects through an authenticated ChatGPT Remote relay to an always-on M1 Mac mini; the mini uses a cloud model API, sends GPU jobs over private LAN SSH, and wakes the Windows/WSL or Linux worker over Wake-on-LAN.](skills/gpu-compute/references/architecture.webp)
 
