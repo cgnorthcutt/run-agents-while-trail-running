@@ -29,7 +29,7 @@ Give your agent:
   <img src="skills/gpu-compute/references/phone-progress.jpg" alt="Full phone screenshot: training progress at 7.25 hours" width="400">
 </p>
 
-*Interim progress report; benchmark details and graph below.*
+*screenshot from my phone using Codex remote*
 
 ## Skills and platforms
 
