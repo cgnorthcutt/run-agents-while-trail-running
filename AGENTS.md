@@ -18,6 +18,8 @@ flowchart TD
   api <-->|Agent inference| coordinator
 ```
 
+This architecture diagram is for engineers. If you are in sales, and especially marketing, please refer to [this diagram](skills/gpu-compute/references/architecture.webp).
+
 ## 0. Coordinator and phone setup
 
 Use **Mac as the default coordinator**: helpers support Mac/Linux, while ChatGPT Remote hosts support Mac/Windows. Linux coordinators need their own supported authenticated remote channel; this runbook supplies none. Windows coordination is not implemented by the helpers. Worker options are in section 2.
