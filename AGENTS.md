@@ -2,6 +2,40 @@
 
 Read this file and both skills before acting. Run orchestration on a **Mac/Linux coordinator**, not on the phone or Windows worker. Inventory first; get account-owner approval before system changes. Never change the Windows SSH default shell, introduce portproxy, disable host-key checks, or put a personal PC to sleep as a test.
 
+## 0. Coordinator and phone setup
+
+Use **Mac as the default coordinator**: helpers support Mac/Linux, while ChatGPT Remote hosts support Mac/Windows. Linux coordinators need their own supported authenticated remote channel; this runbook supplies none. Windows coordination is not implemented by the helpers. Worker options are in section 2.
+
+These steps describe owner-approved preparation, not automatic system changes. Inventory first and reuse existing setup.
+
+**Install coordinator tools.** Install missing Python 3, SSH client, Git, Bash and tmux using an owner-approved package manager. Examples for an existing approved Homebrew or Debian/Ubuntu setup—choose your platform and only missing packages. macOS already supplies SSH and Bash.
+
+```sh
+# macOS, with existing Homebrew:
+brew install python git tmux
+
+# Debian/Ubuntu coordinator; this does not provide phone pairing:
+sudo apt-get update && sudo apt-get install python3 openssh-client git bash tmux
+```
+
+Verify in the coordinator shell the agent will use:
+
+```sh
+command -v python3 ssh git tmux
+command -v bash
+python3 --version
+```
+
+**Pair the phone.** Follow [ChatGPT Remote](https://learn.chatgpt.com/docs/remote-connections): latest desktop ChatGPT (Mac/Windows), latest phone app (iOS/Android), same account/workspace, Codex access, and required MFA/policies. Desktop: **Settings > Connections > Control this Mac or PC > Set up/Add**; scan the QR on your phone and confirm Remote. CLI/IDE alone cannot pair. If rollout/workspace policy makes Remote unavailable, stop phone setup—no public-server workaround.
+
+Keep the desktop app running and host awake/online. The authenticated relay works over 5G without WAN ingress. Configure the agent's project, tools, and skills on the coordinator. Enable Computer Use only when a job needs GUI access; retain other permission checks. The GPU worker needs no Codex installation for these SSH jobs.
+
+**Keep the coordinator available.** If available, **Settings > Connections > Keep this Mac awake** prevents plugged-in host sleep while Remote is enabled. Alternatively, the owner can choose **System Settings > Energy > Prevent automatic sleeping when the display is off**; [availability varies by macOS/hardware](https://support.apple.com/en-gb/guide/mac-help/mchle41a6ccd/mac). Choose and verify an awake setting while plugged in. Display locking can remain enabled; leave FileVault and login settings unchanged. After reboot or power loss, local login, app launch and SSH-key unlock may be required; do not assume automatic recovery.
+
+Keep the coordinator powered and connected to the home LAN. Linux coordinators also need an owner-approved stay-awake policy. tmux alone does not prevent sleep.
+
+**Open the project and continue setup.** Clone using the README commands on the coordinator, or use the reviewed clone already there. Open the clone root as the agent's local project; authorize its workdir/shell and the dedicated SSH key once section 3 is complete. Install the skills using section 1. Keep API keys in a private credential store, never the repo, machine config or worker jobs. Record device addresses/MACs in private configuration outside git; the owner verifies private LAN addresses and router reservations before section 4. Complete the remaining sections and the final ready check before real work.
+
 ## 1. Private configuration and skill installation
 
 From the reviewed repository root on the coordinator:
@@ -15,7 +49,7 @@ chmod 600 "$HOME/.config/phone-mini-gpu/machine.json"
 
 Edit that private copy, never the tracked example. Identify whether SSH lands in Windows cmd/PowerShell (`windows-wsl`) or an existing Linux/WSL shell (**must use `linux`**). Linux transport can omit the WSL fields. Model/provider credentials do not belong in this configuration.
 
-Owner supplies coordinator `python3`, `ssh`, and `tmux` using their approved package manager. Review all scripts before explicitly installing these repository-preserving symlinks; existing entries are not overwritten:
+Review the scripts, then install these skill symlinks; existing entries are not overwritten:
 
 ```sh
 repo="$PWD"
@@ -40,6 +74,18 @@ Use an ordinary, non-administrator Windows SSH account, keys rather than passwor
 - https://learn.microsoft.com/en-us/windows/ai/directml/gpu-cuda-in-wsl
 
 From that Windows account's console, inspect `wsl.exe --list --verbose`, then `wsl.exe --distribution Ubuntu-24.04 --user REPLACE_WITH_WSL_USER --exec id`. Confirm a non-root UID. Owner-approved Ubuntu package installation, inside Linux/WSL: `sudo apt-get update && sudo apt-get install bash coreutils python3 python3-venv git`. Use the Windows NVIDIA/WSL driver path, not a Linux display-driver installation inside WSL. Ordinary Linux workers need their appropriate native GPU driver.
+
+Check the RAM and CPU allocation visible inside WSL during preflight; it may be smaller than the Windows host's resources. Install training frameworks and other workload dependencies in a job-local environment matched to the GPU.
+
+**Windows SSH service.** Inspect `Get-Service sshd`; if missing, the owner installs **OpenSSH Server** through Optional Features using [Microsoft's setup instructions](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse). The installer creates a broad inbound firewall allow, so complete the all-rules review and approved narrowing below **before starting a newly installed service**. Once scoped, an owner-approved administrator runs:
+
+```powershell
+Set-Service -Name sshd -StartupType Automatic
+if ((Get-Service sshd).Status -eq 'Stopped') { Start-Service sshd }
+Get-Service sshd
+```
+
+Do not restart an existing service, replace SSH configuration or add a broad rule.
 
 Inspect **all existing inbound allow rules covering the configured SSH port**, including custom rules. Show the owner their exact names, current profiles/address filters, and proposed adjustments before mutation. An approved administrator, not the compute agent, performs necessary changes. Examples for inspection and a proposed adjustment:
 
@@ -88,6 +134,8 @@ chmod 600 "$HOME/.ssh/known_hosts"
 
 WOL needs the connected **wired NIC's MAC**, a same-LAN source IP actually assigned to the coordinator, and the LAN's real broadcast address. Reserve worker/coordinator IPs. BIOS, NIC, sleep-state, and Fast Startup behavior are manual/vendor-specific. Do not infer a /24 subnet or repair networking automatically.
 
+For a Windows worker, have the owner enable the motherboard's Wake-on-LAN/PCIe wake setting according to its manual. In **Device Manager → Network adapters → Ethernet adapter → Properties**, enable **Wake on Magic Packet** under Advanced and allow the adapter to wake the computer under Power Management, where offered. Prefer magic-packet-only wake. Names and availability vary; see your adapter's documentation ([Intel example](https://www.intel.com/content/www/us/en/support/articles/000059062/ethernet-products/intel-killer-ethernet-products.html)). Keep wake traffic on the LAN; internet-wake features are unnecessary here.
+
 Skip waking an already-awake worker. Verify the machine's supported sleep state; waking from powered-off states is not guaranteed. The magic-packet helper does not provide server BMC power control. The preflight below assumes NVIDIA hardware; substitute the appropriate GPU check for other hardware or CPU-only jobs.
 
 ```sh
@@ -113,6 +161,19 @@ powercfg /requests
 ```
 
 The owner may need an approved administrator terminal for the read-only `powercfg /requests` check. Confirm the system-awake request actually appears; do not assume GPU load or detached WSL interop keeps Windows awake. Follow existing script-execution policy rather than bypassing it. Optional `-StopFile` must be an explicitly chosen absolute Windows path; creating it releases the request within 15 seconds. Ctrl+C or expiry also releases it. Verify release afterward. No power-plan edits, automatic shutdown, or automatic sleep: let normal idle policy apply. Neither tmux nor this request survives/reliably prevents reboots.
+
+**Native Linux workers:** `linux` transport supplies no sleep inhibition. Have the owner verify that the SSH service (`ssh`/`sshd`) is available and starts at boot using the platform's service tools; approve any changes first. Use an existing approved power policy or bounded sleep inhibitor covering computation and saving. Verify effectiveness and release any temporary inhibitor afterward. Never automatically suspend, hibernate or shut down.
+
+## 6. Ready check
+
+- [ ] Turn phone Wi-Fi off and open Remote to the Mac coordinator over cellular data. Linux uses its own supported authenticated channel.
+- [ ] Run wake only if the worker is already asleep and waking is authorized; skip if awake. Never put a personal PC to sleep as a test.
+- [ ] Pass section 4's SSH/GPU/capacity preflight with exit code 0.
+- [ ] From the phone, launch the [two-minute heartbeat](skills/gpu-compute/SKILL.md#phone-disconnect-test-and-persistent-jobs) in coordinator tmux. With Wi-Fi still off, disconnect the phone for at least 30 seconds during the job, then return. Timestamps must continue across the gap; worker and tee exit codes must both be 0.
+- [ ] Verify the Windows awake request is active during the job and released afterward using section 5's procedure. For native Linux, verify approved sleep inhibition and release any temporary inhibitor.
+- [ ] Retrieve `result.txt` containing `ok`, `job.log` with START/FINISH records, and `CHANGES.md` into a private coordinator directory.
+
+Passing demonstrates phone/laptop-disconnect persistence, not reboot recovery. Both machines still need power and connectivity.
 
 ## Publication
 
