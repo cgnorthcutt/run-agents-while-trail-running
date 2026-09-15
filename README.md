@@ -1,4 +1,4 @@
-# phone-mini-codex-gpu
+# Run Agents while Trail Running
 
 **Start work from your phone. Let your sleeping gaming PC wake up and do the heavy lifting.**
 
@@ -12,6 +12,12 @@ Phone → always-on mini → Wake-on-LAN + private LAN SSH → gaming PC → WSL
 
 This repo shares the setup instructions, reusable agent skills, and real benchmarks. Use it for training, builds, rendering, or other heavy jobs while trail running, hiking, or sleeping.
 
+<p align="center">
+  <img src="skills/gpu-compute/references/phone-progress.jpg" alt="Phone screenshot showing the agent's training progress report, loss, perplexity, and learning curves after 7.25 hours" width="400">
+</p>
+
+*Checking progress from my phone the next morning. This is an interim snapshot; the full-size graph and benchmark details are below.*
+
 ## Set it up with your agent
 
 You need an always-on coordinator, a GPU worker, and a phone. The documented phone connection uses ChatGPT Remote on a Mac or Windows host. The helpers run on a Mac/Linux coordinator with Python 3, SSH, and tmux. Windows workers need WSL2; waking requires wired Ethernet and compatible BIOS/NIC settings.
@@ -19,8 +25,8 @@ You need an always-on coordinator, a GPU worker, and a phone. The documented pho
 Clone on the coordinator:
 
 ```sh
-git clone https://github.com/cgnorthcutt/phone-mini-codex-gpu.git
-cd phone-mini-codex-gpu
+git clone https://github.com/cgnorthcutt/run-agents-while-trail-running.git
+cd run-agents-while-trail-running
 ```
 
 Give your agent this prompt:
@@ -35,6 +41,18 @@ The [setup runbook](AGENTS.md) covers accounts, private configuration, SSH keys,
 - [gpu-compute](skills/gpu-compute/SKILL.md): choose compute using benchmarks, run jobs with logs, keep Windows awake for the job, and retrieve results.
 
 The main Windows route uses Windows OpenSSH to start WSL without changing the SSH default shell. Existing Linux/WSL SSH endpoints are also supported; see the runbook for their power-management differences. Machine addresses and credentials stay in your private configuration.
+
+### Other worker hardware
+
+| Worker | Setup |
+|---|---|
+| Windows gaming PC | Tested with the RTX 5090. Windows OpenSSH starts WSL; a temporary awake request keeps the PC running during the job. |
+| Linux GPU rig or NVIDIA server | Use the `linux` transport with the appropriate drivers and workload. |
+| Mac Pro or Mac Studio | Fits the same idea, but needs a macOS job runner and compatible GPU framework. The supplied runner requires Linux. |
+
+**Windows Wake-on-LAN:** enable it for the wired network adapter in firmware and Windows driver settings, then verify your machine's supported sleep state. The wake helper also works with compatible non-Windows hardware on the same private wired LAN. Already-awake workers can skip waking.
+
+Apple silicon GPU training uses [Metal/MPS](https://developer.apple.com/metal/pytorch/); the RTX 5090 CUDA configuration needs adapting. Benchmark your own hardware before choosing where to run a job.
 
 ## Check progress anytime
 

@@ -1,6 +1,6 @@
 # Benchmarks and compute routing
 
-**Repository:** `phone-mini-codex-gpu` · **Date:** 2026-09-15
+**Repository:** `run-agents-while-trail-running` · **Date:** 2026-09-15
 
 These measurements help an agent choose where to run work. The repository supplies the compute setup; the custom training loop and dataset preparation are not included.
 

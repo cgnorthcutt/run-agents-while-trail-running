@@ -30,6 +30,8 @@ Other agents/loaders must load the relevant `SKILL.md` manually if they do not s
 
 ## 2. Worker account, packages, and firewall
 
+**Choose the worker path first.** The instructions below cover Windows/WSL. Native Linux GPU PCs and NVIDIA servers use `linux` transport: skip Windows/WSL setup and Windows power requests, install the appropriate Linux packages/drivers, and restrict SSH to the coordinator. The runner requires Linux, GNU coreutils, and a job directory on the worker's Linux home filesystem. A Mac Pro/Studio worker needs a macOS-native runner and compatible framework; the supplied runner rejects macOS.
+
 Use an ordinary, non-administrator Windows SSH account, keys rather than passwords, and a non-root WSL user. The distribution must be installed for that **same Windows account**; another account's distribution is not sufficient. Follow the existing-system setup guidance:
 
 - https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse
@@ -86,6 +88,8 @@ chmod 600 "$HOME/.ssh/known_hosts"
 
 WOL needs the connected **wired NIC's MAC**, a same-LAN source IP actually assigned to the coordinator, and the LAN's real broadcast address. Reserve worker/coordinator IPs. BIOS, NIC, sleep-state, and Fast Startup behavior are manual/vendor-specific. Do not infer a /24 subnet or repair networking automatically.
 
+Skip waking an already-awake worker. Verify the machine's supported sleep state; waking from powered-off states is not guaranteed. The magic-packet helper does not provide server BMC power control. The preflight below assumes NVIDIA hardware; substitute the appropriate GPU check for other hardware or CPU-only jobs.
+
 ```sh
 python3 skills/wake-gpu/scripts/wake.py --dry-run
 printf '%s\n' 'set -eu' 'uname -a; id; free -h; df -h .; nvidia-smi' | python3 skills/gpu-compute/scripts/worker.py run
@@ -112,4 +116,4 @@ The owner may need an approved administrator terminal for the read-only `powercf
 
 ## Publication
 
-Keep benchmark measurements and updates locally outside git first. Record fixed held-out loss/ppl over iterations, timings, workload/evaluation settings, and limitations. Publish only reviewed, sanitized measured summaries; remove usernames, paths, host identifiers, addresses, keys, raw logs, and phone screenshots. Do not fabricate performance or quality conclusions.
+Keep benchmark measurements and updates locally outside git first. Record fixed held-out loss/ppl over iterations, timings, workload/evaluation settings, and limitations. Publish only reviewed measured summaries. Keep credentials, machine addresses, raw logs, and unreviewed screenshots out of git. Remove private usernames, paths, and host identifiers unless the owner explicitly chooses to share those specific details; review embedded image metadata too. The included phone screenshot is owner-approved; that is not permission to publish other local information. Do not fabricate performance or quality conclusions.
