@@ -19,7 +19,7 @@ flowchart TD
   end
   phone <-->|"ChatGPT Remote relay<br/>5G or Wi-Fi"| coordinator
   api[Cloud model API]
-  coordinator <-->|Agent inference| api
+  api <-->|Agent inference| coordinator
 ```
 
 The coordinator stays awake; the GPU worker can sleep between jobs. Phone access uses an authenticated relay; SSH and wake traffic stay on the home LAN.
