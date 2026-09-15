@@ -1,0 +1,12 @@
+{
+  "ssh_host": "gpu",
+  "transport": "windows-wsl",
+  "wsl_distribution": "Ubuntu-24.04",
+  "wsl_user": "REPLACE_WITH_WSL_USER",
+  "wol_mac": "REPLACE_WITH_ETHERNET_MAC",
+  "wol_source_ip": "REPLACE_WITH_COORDINATOR_LAN_IP",
+  "wol_broadcast_ip": "REPLACE_WITH_LAN_BROADCAST",
+  "ssh_lan_ip": "REPLACE_WITH_WORKER_LAN_IP",
+  "ssh_port": 22,
+  "awake_seconds": 46800
+}

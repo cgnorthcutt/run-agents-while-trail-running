@@ -1,0 +1,61 @@
+{
+  "parameters": 1489488000,
+  "config": {
+    "block_size": 512,
+    "vocab_size": 8192,
+    "n_layer": 48,
+    "n_head": 25,
+    "n_embd": 1600,
+    "dropout": 0.1,
+    "bias": true
+  },
+  "runtime": {
+    "torch": "2.11.0+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "capability": [
+      12,
+      0
+    ],
+    "fused_adamw": true,
+    "attention": "nanoGPT SDPA; backend selected by PyTorch"
+  },
+  "warmup_updates": 1,
+  "measured_updates": 2,
+  "gradient_accumulation": 16,
+  "updates": [
+    {
+      "loss": 8.2905855178833,
+      "gradient_norm": 33.20781707763672,
+      "lr": 4.000000000000001e-06
+    },
+    {
+      "loss": 10.64955598115921,
+      "gradient_norm": 286.92364501953125,
+      "lr": 6e-06
+    }
+  ],
+  "phase_seconds": {
+    "warmup_update": 8.59001605100002,
+    "update_1": 1.453141859000425,
+    "update_2": 1.4182455720001599,
+    "evaluate_train": 0.5995589849999305,
+    "evaluate_val": 0.5977005309996457,
+    "save_best": 6.222069125999951,
+    "save_full": 24.625814087000435,
+    "replace_full": 23.159458142000403,
+    "verify_benchmark-best.pt": 0.00808547499946144,
+    "verify_benchmark-latest.pt": 0.027212984000470897
+  },
+  "benchmark_total_seconds": 66.72627701199963,
+  "seconds_per_accumulated_update": 1.4356937155002925,
+  "seconds_per_microstep_amortized": 0.08973085721876828,
+  "training_tokens_per_second": 5705.952398868972,
+  "train_loss": 9.14274948835373,
+  "val_loss": 9.233539342880249,
+  "peak_allocated_GiB": 25.75059413909912,
+  "peak_reserved_GiB": 25.962890625,
+  "allocator_cap_GiB": 27.9979541015625,
+  "timing_scope": "Peak includes warmup, updates, evaluation and checkpoint I/O; throughput excludes warmup/evaluation/I/O. Total excludes JSON and cleanup.",
+  "tokenizer_sha256": "c1d0bd34814a8ee3071864bf5d8f70bfcdcbb68f1bff755021bd9ff88070dca6"
+}

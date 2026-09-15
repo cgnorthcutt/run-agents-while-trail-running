@@ -1,0 +1,19 @@
+# Machine configuration belongs outside this clone regardless.
+machine.json
+*.local.json
+.env
+.env.*
+*.key
+*.pem
+id_*
+*.log
+jobs/
+job-results/
+local/
+.local/
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+.DS_Store
+# Sanitized benchmark .md/.json/.csv files remain trackable.
