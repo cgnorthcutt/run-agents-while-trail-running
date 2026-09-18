@@ -83,6 +83,4 @@ The **7.25-hour snapshot** below comes from the 12-hour experiment on source-dec
 
 ![nanoGPT training and validation loss and perplexity at 7.25 hours](skills/gpu-compute/references/learning-curve.png)
 
-## Keep it private
 
-Use ordinary accounts, dedicated SSH keys and verified host keys. Keep SSH LAN-scoped; expose no public servers or dashboards. Credentials, addresses and raw logs stay out of git. Job directories aren't sandboxes; WSL can access Windows files.
